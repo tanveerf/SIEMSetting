@@ -1,4 +1,4 @@
-## A to Z in SIEM Setting for Cyber Attacks
+# A to Z in SIEM Setting for Cyber Attacks
 
 In this project, I have worked on setting up Microsoft Sentinel and a vulnerable virtual machine in Azure. This setup is designed to log live cyber attacks, providing real-time insights into cybersecurity threats. The purpose of this project is to demonstrate the use of a cloud-based SIM and a honeypot for monitoring cyber threats and to impart essential cybersecurity practices.
 
@@ -56,4 +56,34 @@ I began by creating a virtual machine in Azure to serve as a honeypot. This invo
    - Open a new tab in the browser and navigate to the Azure portal.
    - Begin setting up Azure Sentinel, which is described as a quick process.
 
-   
+#### Step 4: 
+1. Remote Desktop Access to VM: The VM is accessed via remote desktop. The public IP address of the VM is used for this purpose, and the user logs in with the credentials created during the VM setup.
+2. Security Event Log Review: Inside the VM, the Event Viewer is opened to review security events, focusing on event ID 4625, which indicates failed login attempts. This helps in monitoring unauthorized access attempts.
+3. Downloading and Running PowerShell Script: A PowerShell script is downloaded (or copied) and run on the VM. This script is designed to extract IP addresses from failed login attempts and convert them to geographical data using an IP geolocation API.
+4. API Key for Geolocation: The user is instructed to obtain an API key from a geolocation service provider to enable the conversion of IP addresses to geographic data.
+5. Creation of Custom Log File: The script outputs a custom log file containing geographic information of the attackers. This file is stored in a specific directory (C:\ProgramData) on the VM.
+6. Firewall Settings on VM: The VM’s firewall settings are adjusted to respond to ICMP echo requests, making it more discoverable on the internet, which is essential for the honeypot setup.
+7. Observation of Attack Data: The script runs continuously, logging each failed login attempt with associated geographic data. This data will later be used to create a geo map in Azure Sentinel.
+8. API Key Limitations: There is a mention of the limitations of the free API key for geolocation service, which allows only a thousand calls per day. An upgrade is suggested for more extensive usage.
+
+#### Step 4: 
+
+1. Creating a Custom Log in Log Analytics Workspace: After minimizing the Azure VM, the next step is to create a custom log in the Log Analytics Workspace to incorporate the custom log with geodata from the VM.
+2. Copying Log File from VM: The log file, which is on the VM, is copied to the host machine. This is done by accessing the VM, copying the contents of the log file, and pasting it into a new file on the host machine.
+3. Configuring the Custom Log: The custom log is set up in Azure by specifying the file path where the log resides on the VM and providing other necessary details.
+4. Extracting Fields from the Log Data: Various fields like latitude, longitude, country, and state are extracted from the raw log data. This is done through Azure's interface, ensuring that the data is correctly parsed.
+5. Setting up Azure Sentinel: Azure Sentinel is then set up to use the log data. The process involves configuring a new workbook in Sentinel and adding a query to visualize the data on a world map.
+6. Configuring Map Visualizations: The map visualization is configured to display data based on latitude and longitude or by country. This setup allows for the geographic plotting of the source of failed login attempts.
+7. Testing and Verifying the Setup: The setup is tested by intentionally failing to log into the VM, ensuring that the failed attempts are logged, parsed, and displayed correctly on the Sentinel map.
+8. Monitoring for Cyber Attacks: The system is left running to collect data on real cyber attacks. The Azure Sentinel dashboard is set to auto-refresh every five minutes to display the latest data.
+
+#### Step 5: Analysis of Results
+1. Geographic Distribution of Attacks: The VM experienced a significant number of attacks from Russia, Asia, Southeast Asia, and a few from the Netherlands, France, and Chile. Interestingly, fewer attacks than expected were observed from the Washington D.C. and Virginia areas in the United States.
+2. Nature of Internet Exposure: The text highlights that any device exposed to the internet, regardless of its significance or the owner's profile, is prone to cyber attacks. This includes both personal and business devices, emphasizing that mere internet presence makes a device a target.
+3. Common Attack Patterns: Many attackers attempted to access the VM using common usernames like "administrator." This underscores the importance of avoiding predictable usernames and implementing strong security measures.
+4. Importance of Strong Passwords and Multi-Factor Authentication: Given the high number of login attempts from around the world in just 18 hours, the use of strong passwords and multi-factor authentication is stressed as crucial defense mechanisms.
+5. Global Reach of Cyber Attacks: The text notes the global nature of cyber attacks, with attempts originating from various continents. However, some regions like Africa and Australia showed fewer attacks in the observed period.
+6. Continuous Threat Monitoring: The author expects the number of attacks to increase as the VM becomes more known on the internet, highlighting the need for continuous monitoring of cyber threats.
+7. Educational Value and Resumé Building: The author suggests that practicing setting up and monitoring such a VM can be valuable for learning and can be included in a cybersecurity professional's resume.
+
+In summary, the text provides a real-world example of the widespread and indiscriminate nature of cyber attacks, emphasizing the importance of robust cybersecurity practices for any internet-connected device.
