@@ -100,6 +100,12 @@ Failed_RDP_With_GEO_CL
 3. Geographic Distribution of Attacks: The VM experienced a significant number of attacks from Singapore, Russia, USA, and Netherlands.
 4. Common Attack Patterns: Many attackers attempted to access the VM using common usernames like - administrator, azureuser, student. This underscores the importance of avoiding predictable usernames and implementing strong security measures.
 
+**Heat Map of Attacks**
+![HeatMap of Attacks](https://github.com/tanveerf/SIEMSetting/assets/26730967/3dbf59c3-bd5b-4169-b248-964c25e1c72b)
+
+**RDP Brute Force Attack by Country**
+![RDP Brute Force Attack by Country](https://github.com/tanveerf/SIEMSetting/assets/26730967/d22a8871-e665-45aa-81a8-2b45659a27a0)
+
 #### Project Outcomes
 
 This project not only reinforces the critical role of SIEM systems in modern cybersecurity but also provides a blueprint for effectively setting up and utilizing such systems to detect, analyze, and respond to cyber threats. Key Achievements:
