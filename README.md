@@ -88,16 +88,23 @@ Failed_RDP_With_GEO_CL
 Finally, the system is left running to collect data on real cyber attacks. The Microsoft Sentinel dashboard is set to auto-refresh every five minutes to display the latest data. Note that, for simplicity of this project, although we have collected country, latitude and longitude data, we also have information regarding the username, state and time of attack. We will the following steps for final analysis. 
 
 1. Configuring Map Visualizations: The map visualization is configured to display data based on latitude and longitude or by country. This setup allows for the geographic plotting of the source of failed login attempts. KQL used to setup the map were:
-   ```KQL
-   Failed_RDP_With_GEO_CL
+```KQL
+Failed_RDP_With_GEO_CL
 | extend Latitude_CF = todouble(extract("latitude:([\\d.]+)", 1, RawData))
 | extend Longitude_CF = todouble(extract("longitude:([\\d.]+)", 1, RawData))
 | project Latitude_CF, Longitude_CF
 | summarize Count = count() by bin(Latitude_CF, 0.1), bin(Longitude_CF, 0.1)
 | render worldmap 
-``` 
-3. Testing and Verifying the Setup: The setup is tested by intentionally failing to log into the VM, ensuring that the failed attempts are logged, parsed, and displayed correctly on the Sentinel map.
-4. Geographic Distribution of Attacks: The VM experienced a significant number of attacks from Singapore, Russia, USA, and Netherlands.
-5. Common Attack Patterns: Many attackers attempted to access the VM using common usernames like - administrator, azureuser, student. This underscores the importance of avoiding predictable usernames and implementing strong security measures.
+```
+2. Testing and Verifying the Setup: The setup is tested by intentionally failing to log into the VM, ensuring that the failed attempts are logged, parsed, and displayed correctly on the Sentinel map.
+3. Geographic Distribution of Attacks: The VM experienced a significant number of attacks from Singapore, Russia, USA, and Netherlands.
+4. Common Attack Patterns: Many attackers attempted to access the VM using common usernames like - administrator, azureuser, student. This underscores the importance of avoiding predictable usernames and implementing strong security measures.
 
-In summary, the text provides a real-world example of the widespread and indiscriminate nature of cyber attacks, emphasizing the importance of robust cybersecurity practices for any internet-connected device.
+#### Project Outcomes
+
+This project not only reinforces the critical role of SIEM systems in modern cybersecurity but also provides a blueprint for effectively setting up and utilizing such systems to detect, analyze, and respond to cyber threats. Key Achievements:
+- Successful Integration of SIEM with a Honeypot: The project adeptly combines Microsoft Sentinel's advanced SIEM capabilities with a honeypot setup in Azure, showcasing a proactive approach to cybersecurity.
+- Real-Time Threat Monitoring and Analysis: By logging and analyzing live cyber attacks, the project highlights the importance of continuous monitoring in identifying and understanding potential security breaches.
+- Enhanced Threat Intelligence with GEO Data: The inclusion of geographical data adds a valuable dimension to the analysis, allowing for the visualization and better understanding of the origins and distribution of cyber attacks.
+- Practical Application of Technologies: The project employs a range of technologies—from PowerShell scripting to Kusto Query Language (KQL) and third-party APIs—demonstrating their practical utility in a real-world cybersecurity setting.
+- Valuable Insights for Cybersecurity Best Practices: The project's findings underscore the necessity of robust cybersecurity measures, such as using unpredictable usernames and strong security configurations.
