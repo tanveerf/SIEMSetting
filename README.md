@@ -22,7 +22,7 @@ In this project, I have worked on setting up a framework for Security Informatio
 
 ### 🏃 Project Steps
 
-The project has been divided in 5 key sections which will help build the SIEM Model.
+The project has been divided in 6 key sections which will help build the SIEM Model.
 
 #### 💻 Section 1: Azure Virtual Machine Setup
 
