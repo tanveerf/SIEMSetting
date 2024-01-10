@@ -75,7 +75,7 @@ The Event log in Windows Security has a event ID 4625 that corresponds to 'Faile
 2. Configuring the Custom Log: The custom log is set up in Azure by specifying the file path where the log resides on the VM and providing other necessary details.
 4. Extracting Fields from the Log Data: Various fields like latitude, longitude, country, and state are extracted from the raw log data. This is done by going to Tables in Azure's interface and changing the schema to add new columns for latitude, longitude, country and state.
 5. Setting up Azure Sentinel: Azure Sentinel is then set up to use the log data. The process involves configuring a new workbook in Sentinel and adding a query to visualize the data on a world map.
-6. Extracting Data in New Schema:
+6. Extracting Data in New Schema: we will need to run the following KQL to extract lat, long information from the raw data.
 ```kQL
 Failed_RDP_With_GEO_CL
 | extend Country_CF = extract("country:([^,]+)", 1, RawData)
@@ -84,16 +84,20 @@ Failed_RDP_With_GEO_CL
 ```
 
 #### Section 6: Analysis of Results
-6. Configuring Map Visualizations: The map visualization is configured to display data based on latitude and longitude or by country. This setup allows for the geographic plotting of the source of failed login attempts.
-7. Testing and Verifying the Setup: The setup is tested by intentionally failing to log into the VM, ensuring that the failed attempts are logged, parsed, and displayed correctly on the Sentinel map.
-8. Monitoring for Cyber Attacks: The system is left running to collect data on real cyber attacks. The Azure Sentinel dashboard is set to auto-refresh every five minutes to display the latest data.
 
-1. Geographic Distribution of Attacks: The VM experienced a significant number of attacks from Russia, Asia, Southeast Asia, and a few from the Netherlands, France, and Chile. Interestingly, fewer attacks than expected were observed from the Washington D.C. and Virginia areas in the United States.
-2. Nature of Internet Exposure: The text highlights that any device exposed to the internet, regardless of its significance or the owner's profile, is prone to cyber attacks. This includes both personal and business devices, emphasizing that mere internet presence makes a device a target.
-3. Common Attack Patterns: Many attackers attempted to access the VM using common usernames like "administrator." This underscores the importance of avoiding predictable usernames and implementing strong security measures.
-4. Importance of Strong Passwords and Multi-Factor Authentication: Given the high number of login attempts from around the world in just 18 hours, the use of strong passwords and multi-factor authentication is stressed as crucial defense mechanisms.
-5. Global Reach of Cyber Attacks: The text notes the global nature of cyber attacks, with attempts originating from various continents. However, some regions like Africa and Australia showed fewer attacks in the observed period.
-6. Continuous Threat Monitoring: The author expects the number of attacks to increase as the VM becomes more known on the internet, highlighting the need for continuous monitoring of cyber threats.
-7. Educational Value and Resumé Building: The author suggests that practicing setting up and monitoring such a VM can be valuable for learning and can be included in a cybersecurity professional's resume.
+Finally, the system is left running to collect data on real cyber attacks. The Microsoft Sentinel dashboard is set to auto-refresh every five minutes to display the latest data. Note that, for simplicity of this project, although we have collected country, latitude and longitude data, we also have information regarding the username, state and time of attack. We will the following steps for final analysis. 
+
+1. Configuring Map Visualizations: The map visualization is configured to display data based on latitude and longitude or by country. This setup allows for the geographic plotting of the source of failed login attempts. KQL used to setup the map were:
+   ```KQL
+   Failed_RDP_With_GEO_CL
+| extend Latitude_CF = todouble(extract("latitude:([\\d.]+)", 1, RawData))
+| extend Longitude_CF = todouble(extract("longitude:([\\d.]+)", 1, RawData))
+| project Latitude_CF, Longitude_CF
+| summarize Count = count() by bin(Latitude_CF, 0.1), bin(Longitude_CF, 0.1)
+| render worldmap 
+``` 
+3. Testing and Verifying the Setup: The setup is tested by intentionally failing to log into the VM, ensuring that the failed attempts are logged, parsed, and displayed correctly on the Sentinel map.
+4. Geographic Distribution of Attacks: The VM experienced a significant number of attacks from Singapore, Russia, USA, and Netherlands.
+5. Common Attack Patterns: Many attackers attempted to access the VM using common usernames like - administrator, azureuser, student. This underscores the importance of avoiding predictable usernames and implementing strong security measures.
 
 In summary, the text provides a real-world example of the widespread and indiscriminate nature of cyber attacks, emphasizing the importance of robust cybersecurity practices for any internet-connected device.
