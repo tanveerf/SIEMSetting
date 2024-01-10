@@ -58,29 +58,35 @@ Integration with Azure Sentinel: Azure Sentinel, serving as a Security Informati
 5. Linking VM with Log Analytics Workspace:
    - Return to the Log Analytics Workspace and connect it to the VM by selecting the VM and clicking "connect."
 
-#### Section 4: 
+#### Section 4: Collection of GEO Location Data using API
 
-1. Remote Desktop Access to VM: The VM is accessed via remote desktop. The public IP address of the VM is used for this purpose, and the user logs in with the credentials created during the VM setup.
+The Event log in Windows Security has a event ID 4625 that corresponds to 'Failed Login'. Since we have a honeypot setup in the VM these events will represent the 'RDP Brute Force Attack'. Using an API from: https://app.ipgeolocation.io/login we will need to collect additional GEO information from the these events.
+
+1. Remote Desktop Access to VM: The VM is accessed via remote desktop. The public IP address of the VM is used for this purpose, and we need to use the logs in with the credentials created during the VM setup.
 2. Security Event Log Review: Inside the VM, the Event Viewer is opened to review security events, focusing on event ID 4625, which indicates failed login attempts. This helps in monitoring unauthorized access attempts.
-3. Downloading and Running PowerShell Script: A PowerShell script is downloaded (or copied) and run on the VM. This script is designed to extract IP addresses from failed login attempts and convert them to geographical data using an IP geolocation API.
-4. API Key for Geolocation: The user is instructed to obtain an API key from a geolocation service provider to enable the conversion of IP addresses to geographic data.
-5. Creation of Custom Log File: The script outputs a custom log file containing geographic information of the attackers. This file is stored in a specific directory (C:\ProgramData) on the VM.
-6. Firewall Settings on VM: The VM’s firewall settings are adjusted to respond to ICMP echo requests, making it more discoverable on the internet, which is essential for the honeypot setup.
-7. Observation of Attack Data: The script runs continuously, logging each failed login attempt with associated geographic data. This data will later be used to create a geo map in Azure Sentinel.
-8. API Key Limitations: There is a mention of the limitations of the free API key for geolocation service, which allows only a thousand calls per day. An upgrade is suggested for more extensive usage.
+3. Downloading and Running PowerShell Script: A PowerShell script is downloaded (attached in this repository) and run on the VM. This script is designed to extract IP addresses from failed login attempts and convert them to geographical data using an IP geolocation API.
+4. Creation of Custom Log File: The script outputs a custom log file containing geographic information of the attackers. This file is stored in a specific directory (C:\ProgramData) on the VM.
+5. Firewall Settings on VM: The VM’s firewall settings are adjusted to respond to ICMP echo requests, making it more discoverable on the internet, which is essential for the honeypot setup.
+6. Observation of Attack Data: The script runs continuously, logging each failed login attempt with associated geographic data. This data will later be used to create a geo map in Microsoft Sentinel.
 
-#### Section 5: 
+#### Section 5: Transformation of GEO Location Data
 
 1. Creating a Custom Log in Log Analytics Workspace: After minimizing the Azure VM, the next step is to create a custom log in the Log Analytics Workspace to incorporate the custom log with geodata from the VM.
-2. Copying Log File from VM: The log file, which is on the VM, is copied to the host machine. This is done by accessing the VM, copying the contents of the log file, and pasting it into a new file on the host machine.
-3. Configuring the Custom Log: The custom log is set up in Azure by specifying the file path where the log resides on the VM and providing other necessary details.
-4. Extracting Fields from the Log Data: Various fields like latitude, longitude, country, and state are extracted from the raw log data. This is done through Azure's interface, ensuring that the data is correctly parsed.
+2. Configuring the Custom Log: The custom log is set up in Azure by specifying the file path where the log resides on the VM and providing other necessary details.
+4. Extracting Fields from the Log Data: Various fields like latitude, longitude, country, and state are extracted from the raw log data. This is done by going to Tables in Azure's interface and changing the schema to add new columns for latitude, longitude, country and state.
 5. Setting up Azure Sentinel: Azure Sentinel is then set up to use the log data. The process involves configuring a new workbook in Sentinel and adding a query to visualize the data on a world map.
+6. Extracting Data in New Schema:
+```kQL
+Failed_RDP_With_GEO_CL
+| extend Country_CF = extract("country:([^,]+)", 1, RawData)
+| extend Latitude_CF = todouble(extract("latitude:([\\d.]+)", 1, RawData))
+| extend Longitude_CF = todouble(extract("longitude:([\\d.]+)", 1, RawData))
+```
+
+#### Section 6: Analysis of Results
 6. Configuring Map Visualizations: The map visualization is configured to display data based on latitude and longitude or by country. This setup allows for the geographic plotting of the source of failed login attempts.
 7. Testing and Verifying the Setup: The setup is tested by intentionally failing to log into the VM, ensuring that the failed attempts are logged, parsed, and displayed correctly on the Sentinel map.
 8. Monitoring for Cyber Attacks: The system is left running to collect data on real cyber attacks. The Azure Sentinel dashboard is set to auto-refresh every five minutes to display the latest data.
-
-#### Section 6: Analysis of Results
 
 1. Geographic Distribution of Attacks: The VM experienced a significant number of attacks from Russia, Asia, Southeast Asia, and a few from the Netherlands, France, and Chile. Interestingly, fewer attacks than expected were observed from the Washington D.C. and Virginia areas in the United States.
 2. Nature of Internet Exposure: The text highlights that any device exposed to the internet, regardless of its significance or the owner's profile, is prone to cyber attacks. This includes both personal and business devices, emphasizing that mere internet presence makes a device a target.
